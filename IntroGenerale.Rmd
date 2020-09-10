@@ -1,0 +1,405 @@
+---
+title: "Analyse Univariée (avec R)"
+author: "M2 IGAST"
+date: "2020-2021"
+output: 
+  revealjs::revealjs_presentation:
+    theme: sky 
+    transition: fade
+    center: true
+    self_contained: false
+    reveal_options:
+      slideNumber: true
+      previewLinks: true
+    
+css : style.css
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.width =6,fig.align="center", fig.height = 3)
+library(revealjs)
+library(tidyverse)
+library(palmerpenguins)
+library(knitr)
+library(xtable)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+```
+
+
+
+
+## Introduction générale 
+
+<br><br>
+<br><br>
+<br><br>
+<small>
+<div style="text-align:center;">
+<span style="color:red">&#9888;</span>Pour voir les formules mathématiques, une connexion internet est requise.<span style="color:red">&#9888;</span>
+</div>
+</small>
+
+
+## Reférences
+
+<br>
+
+
+
+- Cours M2 IGAST 2018 d'Ana-Maria Olteanu-Raimond 
+- R et espace https://framabook.org/r-et-espace/
+- Probabilités, analyse de données et statistiques , Gilbert Saporta, Editions TECHNIP, 2011
+- Cours de H. COmmenges https://gitlab.huma-num.fr/hcommenges/cours_statcomplet/-/raw/master/cours_statcomplet.pdf
+- Nombreuses ressources en ligne, e.g. : 
+    - http://www.foad-mooc.auf.org/IMG/pdf/424B_-Application_des_methodes_statistiques_d_analyse.pdf
+    - http://www.itse.be/statistique2010/co/Module_statistique_FSP.html
+
+
+## Analyse spatiale : définition 
+
+<br>
+<br>
+
+L’analyse spatiale étudie la **répartition** et l’**organisation** d’ensembles d’objets qui sont **localisés**  
+<br>
+L’objectif est de : 
+
+<p>
+*«déceler en quoi la localisation apporte un élément utile à la connaissances des objets étudiés et peut en expliquer les caractéristiques»* 
+</p>
+<div style="text-align:right;">
+[Pumain, Saint-Julien 97] </div>
+
+
+## Spécificité de l'analyse **spatiale**
+<span style="text-decoration: underline;text-decoration-color: #96C31E;">Analyse statistique :</span> 
+
+Méthodes *résumant* et *généralisant* des observations
+
+* Les unités d’analyse sont des éléments indépendants en principe 
+* On ne s’intéresse pas à leur localisation ni à leur intéractions (spatiales)
+
+<span style="text-decoration: underline;
+  text-decoration-color: #96C31E;">Analyse **spatiale** statistique : </span>
+
+  * Les unités d’analyse sont localisables 
+  * On s’intéresse à leur propriétés y compris la localisation
+  * On fait l’hypothèse que leur localisation peut influencer les valeurs observées
+
+
+## Deux approches 
+Analyse géométrique : 
+
+approche **géométrique** pour mieux décrire les données: analyse de forme, de réseaux, de proximité, méthodes de création de nouvelles entités à partir de la géométrie des objets
+
+<div style="border: solid #96C31E 4px; border-radius:12px; ">
+<div style="margin: 10px; text-align:left;">Analyse de données  : 
+
+approche **statistique** permettant de faire émerger des relations (des groupes, des lois)  pour aider  l’étude de certains phénomènes</div>
+</div>
+
+
+## Deux familles  
+<br><br><br>
+statistiques **inférentielles** et statistiques **descriptives** 
+
+## Statistiques inférentielles
+
+<br><br>
+
+  A partir d'un échantillon , que peut-on attendre (=**inférer**) de la population ?
+
+<br>
+
+  - Modèles, estimateurs, ... : **régression**, **estimation**, **extrapolation**
+  - e.g. sondages, rencensement 
+  
+## Statistiques inférentielles : exemple
+  
+```{r reglinexple, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+library(tidyverse)
+ggplot(data = penguins, 
+                       aes(x = flipper_length_mm,
+                           y = body_mass_g)) +
+  geom_point(aes(color = species, 
+                 shape = species),
+             size = 3,
+             alpha = 0.8) +
+  #theme_minimal() +
+  scale_color_manual(values = c("darkorange","purple","cyan4")) +
+  labs(title = "Penguin size, Palmer Station LTER",
+       subtitle = "Flipper length and body mass for Adelie, Chinstrap and Gentoo Penguins",
+       x = "Flipper length (mm)",
+       y = "Body mass (g)",
+       color = "Penguin species",
+       shape = "Penguin species") +
+    stat_smooth(method="lm", se=FALSE)+
+  theme_minimal()
+```
+  
+  
+<small>
+Penguins data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network.
+[https://github.com/allisonhorst/palmerpenguins]
+</small>
+
+
+## Statistiques descriptives 
+Décrire, résumer, synthétiser  les propriétés d'une **population** à partir des **variables** qui décrivent ses individus.
+<br><br>
+  
+  - *Graphiques* : nuages de points , histogramme, ...
+  - *Mesures* (fréquences, distributions, moments) sur des variables
+  - *Liaisons* statistiques entre variables : corrélation, covariance,...
+  - *Structure* interne des données : classification , ACP,...
+
+## Dans ce module 
+<br>
+<br>
+
+
+
+Nous ferons majoritairement de la statistique **descriptive**
+
+(même si, pour bien décrire, il faut parfois inférer)
+
+
+## Vocabulaire & Contexte
+
+
+ 
+## Population
+<br><br>
+
+ **Ensemble** d'individus  
+ 
+ "données", "corpus", "échantillon", "data"
+ 
+<br><br>
+très souvent tabulaires 
+ 
+ 
+## Individus
+<br><br>
+
+ **Unité** statistique **élémentaire**: personnes, logements, ...
+ 
+ <br><br>
+  $\rightarrow$ "les lignes du tableau"
+
+
+## Variables 
+
+<br><br>
+
+ **Caractéristiques, propriétés** d’un individu, mesurées par des enquêtes, des observations...
+<br><br>
+$\rightarrow$ "les colonnes du tableau"  
+
+
+
+
+
+## Types de variables 
+
+
+- **Qualitatives** : facteurs e.g. genre, CSP, type de pokemon,... 
+<br>$\rightarrow$ notion de **modalité**
+ 
+- **Quantitatives** : nombres e.g. taille, masse, revenu, surface, points de vie,...  
+$\rightarrow$ parfois exprimées avec des **unités** : m, kg, s
+
+<br>
+
+<span style="color:red">&#9888;</span> **Valeurs** et **Nature** de données sont deux choses distinctes : 3≠trois≠III≠drei≠tres 
+<br>
+<br>
+<span style="color:red">&#9888;</span> Valeurs manquantes  :  NA , NaN, Null 
+
+
+
+## Types de variables et représentations
+
+Type  |		Échelle/Axes |
+----------------|------------|
+quantitative continue |	continue |	
+quantitative discrète| discrète 	|
+qualitative/modale non ordonnée |	discrète |
+qualitative/modale ordonnée |	discrète |	
+dates |	continue ou discrète |	
+texte |	aucune ou discrète |	
+
+<small>
+tiré de 
+Fundamentals of Data Visualization
+Claus O. Wilke [https://serialmentor.com/dataviz/]
+</small>
+
+
+
+
+
+## Difficultés de la statistique
+
+Sur les mêmes chiffres du bilan d’une entreprise en 2013 et 2014
+
+* Mme. AAA : «tous les salaires ont baissé de 10%»
+* Mme. BBB :  «le salaire moyen a augmenté d’environ 18%»
+
+
+|               |   Ouvriers    |           Cadres   |       
+|:--------------|--------------:|-------------------:|
+| 2013          | effectif : 500| effectif : 100      |
+|               | salaire : 1300|  salaire :2200       |
+| 2014          | effectif : 200           |        effectif :  400        |
+|               | salaire :1170          | salaire :        1980       |
+
+
+
+
+## Précautions : Taille et représentativité de  l'échantillon
+
+<center>
+<img src="./daltons.jpeg" width=600px>
+</center>
+
+
+## Précautions : en présence de groupes (paradoxe de Simpsons)
+
+
+
+<div style="text-align:center">
+<img src="./Simpsons_paradox_-_animation.gif">
+</div>
+
+<small>
+source: wikipedia
+</small>
+
+
+
+## Données "non spatiales" 
+
+Les variables sont des valeurs attributaires d'**individus**, leurs localisation n'est pas prise en compte
+
+## Données spatiales
+  
+  Individus restreints spatialement (**selection spatiale**), ou variables de **localisation** géographique (e.g. Lieu de résidence, coordonnées) renseignées pour les individus 
+  
+  
+  
+  quid des **distances** ? $\rightarrow$ modèle gravitaire , réseau etc.
+
+
+## \ 
+
+#### variables quantitatives **continues** : $var \in \mathbb{R}$
+
+Valeurs réelles,  toutes les valeurs de l'intervalle de mesures peuvent exister 
+<br><br>
+
+#### variables quantitatives **discrètes**  : $var \in \mathbb{N}$ 
+
+Valeurs entières, pour des attributs **dénombrables** (comptage) , 
+
+parfois utilisées pour encoder une variable qualitative à deux modalités e.g. présence (1) , absence(0)
+
+
+## Variables **qualitatives**
+
+les valeurs sont prises dans un ensemble **fini** de valeurs possibles, défini par **extension** (i.e. on donne la liste des valeurs possibles)
+
+
+$\rightarrow$ notion de **modalités** 
+
+## \ 
+
+#### variables qualitatives **nominales**
+
+Les modalités ne sont **pas ordonnées** explicitement 
+
+e.g. situation matrimoniale $\in$ {marié·e, célibataire, veuf·ve}
+
+#### variables qualitatives **ordinales**
+
+Les modalités sont **ordonnées** selon un ordre **total** et non-ambigu. 
+
+e.g. Echelle de Likert (5 ou 7 valeurs, dont une neutre)
+
+satisfaction $\in$ {Très satisfait, Satisfait, Ni satisfait ni insatisfait, Peu satisfait, Pas du tout satisfait}
+
+
+## l'Échelle d’Analyse
+
+
+Spécificité de la statistique spatiale : à quelle échelle observer ? 
+
+Quel découpage, quelles unités spatiales ?
+
+«Problème insoluble» : le **MAUP** (Modifiable Areal Unit Problem)
+
+##  Unités spatiales agrégées 
+
+agrégation d’unités spatiales : comtés, départements, régions, pays
+
+e.g. Comprendre comment  le taux de chômage d’un pays est distribué entre les régions pour guider les politiques économiques
+
+## Groupe d’unités spatiales: 
+
+identification des unités spatiales ayant des caractéristiques semblables
+
+e.g. IRIS
+
+
+
+## Échelle individuelle vs. Échelle agrégée 
+
+**Désagrégation** ou  **Ventilation** 
+<br>
+  $\rightarrow$ Inférer des caractéristiques individuelles à partir de l’analyse de données agrégées
+
+<br>
+**Agrégation** 
+<br>
+  $\rightarrow$ Inférer des caractéristiques concernant les unités agrégées d’après les caractéristiques individuelles 
+<br><br>
+<span style="color:red">&#9888;</span>pas toujours possible et pas immédiat !<span style="color:red">&#9888;</span>
+
+## le MAUP (Modifibale Aereal Unit Problem)
+
+Problème d'agrégation spatiale : les résultats d'une analyse statistique spatiale dépendent du choix d'agragation 
+
+biais «sytématique et insoluble» 
+
+Exemples tirés du rapport ESPON : 
+
+[https://www.espon.eu/sites/default/files/attachments/espon343_maup_final_version2_nov_2006.pdf](https://www.espon.eu/sites/default/files/attachments/espon343_maup_final_version2_nov_2006.pdf)
+
+
+## MAUP exemple 1
+
+
+<div style="text-align:center">
+<img src="./Maup1.png" width=100% >
+</div>
+
+## MAUP exemple 2
+
+<div style="text-align:center">
+<img src="./Maup2.png" width=100%>
+</div>
+
+
+## La première" chose à faire "
+
+Représenter/Tracer/Cartographier  les variables de la population !
+
+
+<div style="text-align:center">
+<img src="./DinoSequentialSmaller.gif " width=100%>
+</div>
+
+

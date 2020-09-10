@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="M2 IGAST" />
+  <title>Analyse Univariée (avec R)</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="IntroGenerale_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+
+<link rel="stylesheet" href="IntroGenerale_files/reveal.js-3.3.0.1/css/theme/sky.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="style.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Analyse Univariée (avec R)</h1>
+    <h2 class="author">M2 IGAST</h2>
+    <h3 class="date">2020-2021</h3>
+</section>
+
+<section id="introduction-générale" class="slide level2">
+<h2>Introduction générale</h2>
+<br><br> <br><br> <br><br> <small>
+<div style="text-align:center;">
+<p><span style="color:red">⚠</span>Pour voir les formules mathématiques, une connexion internet est requise.<span style="color:red">⚠</span></p>
+</div>
+<p></small></p>
+</section>
+<section id="reférences" class="slide level2">
+<h2>Reférences</h2>
+<p><br></p>
+<ul>
+<li>Cours M2 IGAST 2018 d'Ana-Maria Olteanu-Raimond</li>
+<li>R et espace <a href="https://framabook.org/r-et-espace/" class="uri">https://framabook.org/r-et-espace/</a></li>
+<li>Probabilités, analyse de données et statistiques , Gilbert Saporta, Editions TECHNIP, 2011</li>
+<li>Cours de H. COmmenges <a href="https://gitlab.huma-num.fr/hcommenges/cours_statcomplet/-/raw/master/cours_statcomplet.pdf" class="uri">https://gitlab.huma-num.fr/hcommenges/cours_statcomplet/-/raw/master/cours_statcomplet.pdf</a></li>
+<li>Nombreuses ressources en ligne, e.g. :
+<ul>
+<li><a href="http://www.foad-mooc.auf.org/IMG/pdf/424B_-Application_des_methodes_statistiques_d_analyse.pdf" class="uri">http://www.foad-mooc.auf.org/IMG/pdf/424B_-Application_des_methodes_statistiques_d_analyse.pdf</a></li>
+<li><a href="http://www.itse.be/statistique2010/co/Module_statistique_FSP.html" class="uri">http://www.itse.be/statistique2010/co/Module_statistique_FSP.html</a></li>
+</ul></li>
+</ul>
+</section>
+<section id="analyse-spatiale-définition" class="slide level2">
+<h2>Analyse spatiale : définition</h2>
+<p><br> <br></p>
+<p>L’analyse spatiale étudie la <strong>répartition</strong> et l’<strong>organisation</strong> d’ensembles d’objets qui sont <strong>localisés</strong><br />
+<br> L’objectif est de :</p>
+<p>
+<em>«déceler en quoi la localisation apporte un élément utile à la connaissances des objets étudiés et peut en expliquer les caractéristiques»</em>
+</p>
+<div style="text-align:right;">
+[Pumain, Saint-Julien 97]
+</div>
+</section>
+<section id="spécificité-de-lanalyse-spatiale" class="slide level2">
+<h2>Spécificité de l'analyse <strong>spatiale</strong></h2>
+<p><span style="text-decoration: underline;text-decoration-color: #96C31E;">Analyse statistique :</span></p>
+<p>Méthodes <em>résumant</em> et <em>généralisant</em> des observations</p>
+<ul>
+<li>Les unités d’analyse sont des éléments indépendants en principe</li>
+<li>On ne s’intéresse pas à leur localisation ni à leur intéractions (spatiales)</li>
+</ul>
+<p><span style="text-decoration: underline;
+  text-decoration-color: #96C31E;">Analyse <strong>spatiale</strong> statistique : </span></p>
+<ul>
+<li>Les unités d’analyse sont localisables</li>
+<li>On s’intéresse à leur propriétés y compris la localisation</li>
+<li>On fait l’hypothèse que leur localisation peut influencer les valeurs observées</li>
+</ul>
+</section>
+<section id="deux-approches" class="slide level2">
+<h2>Deux approches</h2>
+<p>Analyse géométrique :</p>
+<p>approche <strong>géométrique</strong> pour mieux décrire les données: analyse de forme, de réseaux, de proximité, méthodes de création de nouvelles entités à partir de la géométrie des objets</p>
+<div style="border: solid #96C31E 4px; border-radius:12px; ">
+<div style="margin: 10px; text-align:left;">
+<p>Analyse de données :</p>
+approche <strong>statistique</strong> permettant de faire émerger des relations (des groupes, des lois) pour aider l’étude de certains phénomènes
+</div>
+</div>
+</section>
+<section id="deux-familles" class="slide level2">
+<h2>Deux familles</h2>
+<p><br><br><br> statistiques <strong>inférentielles</strong> et statistiques <strong>descriptives</strong></p>
+</section>
+<section id="statistiques-inférentielles" class="slide level2">
+<h2>Statistiques inférentielles</h2>
+<p><br><br></p>
+<p>A partir d'un échantillon , que peut-on attendre (=<strong>inférer</strong>) de la population ?</p>
+<p><br></p>
+<ul>
+<li>Modèles, estimateurs, ... : <strong>régression</strong>, <strong>estimation</strong>, <strong>extrapolation</strong></li>
+<li>e.g. sondages, rencensement</li>
+</ul>
+</section>
+<section id="statistiques-inférentielles-exemple" class="slide level2">
+<h2>Statistiques inférentielles : exemple</h2>
+<p><img src="IntroGenerale_files/figure-revealjs/reglinexple-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><small> Penguins data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network. [<a href="https://github.com/allisonhorst/palmerpenguins" class="uri">https://github.com/allisonhorst/palmerpenguins</a>] </small></p>
+</section>
+<section id="statistiques-descriptives" class="slide level2">
+<h2>Statistiques descriptives</h2>
+<p>Décrire, résumer, synthétiser les propriétés d'une <strong>population</strong> à partir des <strong>variables</strong> qui décrivent ses individus. <br><br></p>
+<ul>
+<li><em>Graphiques</em> : nuages de points , histogramme, ...</li>
+<li><em>Mesures</em> (fréquences, distributions, moments) sur des variables</li>
+<li><em>Liaisons</em> statistiques entre variables : corrélation, covariance,...</li>
+<li><em>Structure</em> interne des données : classification , ACP,...</li>
+</ul>
+</section>
+<section id="dans-ce-module" class="slide level2">
+<h2>Dans ce module</h2>
+<p><br> <br></p>
+<p>Nous ferons majoritairement de la statistique <strong>descriptive</strong></p>
+<p>(même si, pour bien décrire, il faut parfois inférer)</p>
+</section>
+<section id="vocabulaire-contexte" class="slide level2">
+<h2>Vocabulaire &amp; Contexte</h2>
+</section>
+<section id="population" class="slide level2">
+<h2>Population</h2>
+<p><br><br></p>
+<p><strong>Ensemble</strong> d'individus</p>
+<p>&quot;données&quot;, &quot;corpus&quot;, &quot;échantillon&quot;, &quot;data&quot;</p>
+<p><br><br> très souvent tabulaires</p>
+</section>
+<section id="individus" class="slide level2">
+<h2>Individus</h2>
+<p><br><br></p>
+<p><strong>Unité</strong> statistique <strong>élémentaire</strong>: personnes, logements, ...</p>
+<p><br><br> <span class="math inline">\(\rightarrow\)</span> &quot;les lignes du tableau&quot;</p>
+</section>
+<section id="variables" class="slide level2">
+<h2>Variables</h2>
+<p><br><br></p>
+<p><strong>Caractéristiques, propriétés</strong> d’un individu, mesurées par des enquêtes, des observations... <br><br> <span class="math inline">\(\rightarrow\)</span> &quot;les colonnes du tableau&quot;</p>
+</section>
+<section id="types-de-variables" class="slide level2">
+<h2>Types de variables</h2>
+<ul>
+<li><p><strong>Qualitatives</strong> : facteurs e.g. genre, CSP, type de pokemon,... <br><span class="math inline">\(\rightarrow\)</span> notion de <strong>modalité</strong></p></li>
+<li><p><strong>Quantitatives</strong> : nombres e.g. taille, masse, revenu, surface, points de vie,...<br />
+<span class="math inline">\(\rightarrow\)</span> parfois exprimées avec des <strong>unités</strong> : m, kg, s</p></li>
+</ul>
+<p><br></p>
+<p><span style="color:red">⚠</span> <strong>Valeurs</strong> et <strong>Nature</strong> de données sont deux choses distinctes : 3≠trois≠III≠drei≠tres <br> <br> <span style="color:red">⚠</span> Valeurs manquantes : NA , NaN, Null</p>
+</section>
+<section id="types-de-variables-et-représentations" class="slide level2">
+<h2>Types de variables et représentations</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Échelle/Axes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>quantitative continue</td>
+<td>continue</td>
+</tr>
+<tr class="even">
+<td>quantitative discrète</td>
+<td>discrète</td>
+</tr>
+<tr class="odd">
+<td>qualitative/modale non ordonnée</td>
+<td>discrète</td>
+</tr>
+<tr class="even">
+<td>qualitative/modale ordonnée</td>
+<td>discrète</td>
+</tr>
+<tr class="odd">
+<td>dates</td>
+<td>continue ou discrète</td>
+</tr>
+<tr class="even">
+<td>texte</td>
+<td>aucune ou discrète</td>
+</tr>
+</tbody>
+</table>
+<p><small> tiré de Fundamentals of Data Visualization Claus O. Wilke [<a href="https://serialmentor.com/dataviz/" class="uri">https://serialmentor.com/dataviz/</a>] </small></p>
+</section>
+<section id="difficultés-de-la-statistique" class="slide level2">
+<h2>Difficultés de la statistique</h2>
+<p>Sur les mêmes chiffres du bilan d’une entreprise en 2013 et 2014</p>
+<ul>
+<li>Mme. AAA : «tous les salaires ont baissé de 10%»</li>
+<li>Mme. BBB : «le salaire moyen a augmenté d’environ 18%»</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Ouvriers</th>
+<th style="text-align: right;">Cadres</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2013</td>
+<td style="text-align: right;">effectif : 500</td>
+<td style="text-align: right;">effectif : 100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">salaire : 1300</td>
+<td style="text-align: right;">salaire :2200</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014</td>
+<td style="text-align: right;">effectif : 200</td>
+<td style="text-align: right;">effectif : 400</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">salaire :1170</td>
+<td style="text-align: right;">salaire : 1980</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="précautions-taille-et-représentativité-de-léchantillon" class="slide level2">
+<h2>Précautions : Taille et représentativité de l'échantillon</h2>
+<center>
+<img src="daltons.jpeg" width=600px>
+</center>
+</section>
+<section id="précautions-en-présence-de-groupes-paradoxe-de-simpsons" class="slide level2">
+<h2>Précautions : en présence de groupes (paradoxe de Simpsons)</h2>
+<div style="text-align:center">
+<p><img src="Simpsons_paradox_-_animation.gif"></p>
+</div>
+<p><small> source: wikipedia </small></p>
+</section>
+<section id="données-non-spatiales" class="slide level2">
+<h2>Données &quot;non spatiales&quot;</h2>
+<p>Les variables sont des valeurs attributaires d'<strong>individus</strong>, leurs localisation n'est pas prise en compte</p>
+</section>
+<section id="données-spatiales" class="slide level2">
+<h2>Données spatiales</h2>
+<p>Individus restreints spatialement (<strong>selection spatiale</strong>), ou variables de <strong>localisation</strong> géographique (e.g. Lieu de résidence, coordonnées) renseignées pour les individus</p>
+<p>quid des <strong>distances</strong> ? <span class="math inline">\(\rightarrow\)</span> modèle gravitaire , réseau etc.</p>
+</section>
+<section id="section" class="slide level2">
+<h2> </h2>
+<h4 id="variables-quantitatives-continues-var-in-mathbbr">variables quantitatives <strong>continues</strong> : <span class="math inline">\(var \in \mathbb{R}\)</span></h4>
+<p>Valeurs réelles, toutes les valeurs de l'intervalle de mesures peuvent exister <br><br></p>
+<h4 id="variables-quantitatives-discrètes-var-in-mathbbn">variables quantitatives <strong>discrètes</strong> : <span class="math inline">\(var \in \mathbb{N}\)</span></h4>
+<p>Valeurs entières, pour des attributs <strong>dénombrables</strong> (comptage) ,</p>
+<p>parfois utilisées pour encoder une variable qualitative à deux modalités e.g. présence (1) , absence(0)</p>
+</section>
+<section id="variables-qualitatives" class="slide level2">
+<h2>Variables <strong>qualitatives</strong></h2>
+<p>les valeurs sont prises dans un ensemble <strong>fini</strong> de valeurs possibles, défini par <strong>extension</strong> (i.e. on donne la liste des valeurs possibles)</p>
+<p><span class="math inline">\(\rightarrow\)</span> notion de <strong>modalités</strong></p>
+</section>
+<section id="section-1" class="slide level2">
+<h2> </h2>
+<h4 id="variables-qualitatives-nominales">variables qualitatives <strong>nominales</strong></h4>
+<p>Les modalités ne sont <strong>pas ordonnées</strong> explicitement</p>
+<p>e.g. situation matrimoniale <span class="math inline">\(\in\)</span> {marié·e, célibataire, veuf·ve}</p>
+<h4 id="variables-qualitatives-ordinales">variables qualitatives <strong>ordinales</strong></h4>
+<p>Les modalités sont <strong>ordonnées</strong> selon un ordre <strong>total</strong> et non-ambigu.</p>
+<p>e.g. Echelle de Likert (5 ou 7 valeurs, dont une neutre)</p>
+<p>satisfaction <span class="math inline">\(\in\)</span> {Très satisfait, Satisfait, Ni satisfait ni insatisfait, Peu satisfait, Pas du tout satisfait}</p>
+</section>
+<section id="léchelle-danalyse" class="slide level2">
+<h2>l'Échelle d’Analyse</h2>
+<p>Spécificité de la statistique spatiale : à quelle échelle observer ?</p>
+<p>Quel découpage, quelles unités spatiales ?</p>
+<p>«Problème insoluble» : le <strong>MAUP</strong> (Modifiable Areal Unit Problem)</p>
+</section>
+<section id="unités-spatiales-agrégées" class="slide level2">
+<h2>Unités spatiales agrégées</h2>
+<p>agrégation d’unités spatiales : comtés, départements, régions, pays</p>
+<p>e.g. Comprendre comment le taux de chômage d’un pays est distribué entre les régions pour guider les politiques économiques</p>
+</section>
+<section id="groupe-dunités-spatiales" class="slide level2">
+<h2>Groupe d’unités spatiales:</h2>
+<p>identification des unités spatiales ayant des caractéristiques semblables</p>
+<p>e.g. IRIS</p>
+</section>
+<section id="échelle-individuelle-vs.-échelle-agrégée" class="slide level2">
+<h2>Échelle individuelle vs. Échelle agrégée</h2>
+<p><strong>Désagrégation</strong> ou <strong>Ventilation</strong> <br> <span class="math inline">\(\rightarrow\)</span> Inférer des caractéristiques individuelles à partir de l’analyse de données agrégées</p>
+<p><br> <strong>Agrégation</strong> <br> <span class="math inline">\(\rightarrow\)</span> Inférer des caractéristiques concernant les unités agrégées d’après les caractéristiques individuelles <br><br> <span style="color:red">⚠</span>pas toujours possible et pas immédiat !<span style="color:red">⚠</span></p>
+</section>
+<section id="le-maup-modifibale-aereal-unit-problem" class="slide level2">
+<h2>le MAUP (Modifibale Aereal Unit Problem)</h2>
+<p>Problème d'agrégation spatiale : les résultats d'une analyse statistique spatiale dépendent du choix d'agragation</p>
+<p>biais «sytématique et insoluble»</p>
+<p>Exemples tirés du rapport ESPON :</p>
+<p><a href="https://www.espon.eu/sites/default/files/attachments/espon343_maup_final_version2_nov_2006.pdf" class="uri">https://www.espon.eu/sites/default/files/attachments/espon343_maup_final_version2_nov_2006.pdf</a></p>
+</section>
+<section id="maup-exemple-1" class="slide level2">
+<h2>MAUP exemple 1</h2>
+<div style="text-align:center">
+<p><img src="Maup1.png" width=100% ></p>
+</div>
+</section>
+<section id="maup-exemple-2" class="slide level2">
+<h2>MAUP exemple 2</h2>
+<div style="text-align:center">
+<p><img src="Maup2.png" width=100%></p>
+</div>
+</section>
+<section id="la-précaution-à-prendre" class="slide level2">
+<h2>La précaution à prendre</h2>
+<p>Représenter les variables</p>
+<div style="text-align:center">
+<p><img src="./DinoSequentialSmaller.gif " width=100%></p>
+</div>
+</section>
+    </div>
+  </div>
+
+  <script src="IntroGenerale_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="IntroGenerale_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: true,
+        // Opens links in an iframe preview overlay
+        previewLinks: true,
+        // Transition style
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

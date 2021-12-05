@@ -16,3 +16,5 @@ ggplot(data = penguins,
        shape = "Penguin species") +
   stat_smooth(method="lm", se=FALSE)+
   theme_minimal()
+
+
